@@ -340,6 +340,59 @@
   .light ::-webkit-scrollbar-thumb:hover {
     @apply bg-champagne-500;
   }
+
+  @font-face {
+    font-family: 'Onest';
+    src: url('/fonts/Onest/Onest-Medium.woff2') format('woff2');
+    font-weight: 400; /* Используем Medium как базовый (Regular) */
+    font-style: normal;
+    font-display: swap;
+
+  }
+
+  @font-face {
+    font-family: 'Onest';
+    src: url('/fonts/Onest/Onest-Medium.woff2') format('woff2');
+    font-weight: 500; /* Medium */
+    font-style: normal;
+    font-display: swap;
+
+  }
+
+  @font-face {
+    font-family: 'Onest';
+    src: url('/fonts/Onest/Onest-Semibold.woff2') format('woff2');
+    font-weight: 600; /* SemiBold */
+    font-style: normal;
+    font-display: swap;
+    line-gap-override: 1000%;
+  }
+
+  @font-face {
+    font-family: 'Onest';
+    src: url('/fonts/Onest/Onest-Bold.woff2') format('woff2');
+    font-weight: 700; /* Bold */
+    font-style: normal;
+    font-display: swap;
+
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    /* Заменяем пробел в названии папки на %20 для корректной работы URL */
+    src: url('/fonts/JetBrains Mono/JetBrainsMono-Medium.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    src: url('/fonts/JetBrains Mono/JetBrainsMono-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
 }
 
 /* Twemoji — cross-platform emoji rendering */
@@ -685,20 +738,6 @@ img.twemoji {
   }
 
   /* ========== MOBILE PERFORMANCE: Disable backdrop-blur ========== */
-  @media (max-width: 1023px) {
-    /* Disable all backdrop-blur on mobile for better scroll performance */
-    .backdrop-blur,
-    .backdrop-blur-sm,
-    .backdrop-blur-md,
-    .backdrop-blur-lg,
-    .backdrop-blur-xl,
-    .backdrop-blur-2xl,
-    .backdrop-blur-3xl,
-    .backdrop-blur-linear {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-    }
-  }
 
   /* ========== LIGHT THEME COMPONENTS (Champagne) ========== */
 

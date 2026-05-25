@@ -5,43 +5,50 @@ interface WheelLegendProps {
   prizes: WheelPrize[];
 }
 
-const WheelLegend = memo(function WheelLegend({ prizes }: WheelLegendProps) {
-  // Get sector color (same logic as in FortuneWheel)
-  const getSectorColor = (index: number, baseColor?: string) => {
-    if (baseColor) return baseColor;
-    const colors = [
-      '#8B5CF6',
-      '#EC4899',
-      '#3B82F6',
-      '#10B981',
-      '#F59E0B',
-      '#EF4444',
-      '#6366F1',
-      '#14B8A6',
-    ];
-    return colors[index % colors.length];
-  };
+// Та же палитра, что и в FortuneWheel — для визуальной консистентности
+const FALLBACK_COLORS = [
+  '#A855F7',
+  '#8B5CF6',
+  '#7C3AED',
+  '#9333EA',
+  '#C026D3',
+  '#A855F7',
+  '#8B5CF6',
+  '#7C3AED',
+];
 
+const getPrizeColor = (index: number, baseColor?: string) =>
+  baseColor || FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+
+const WheelLegend = memo(function WheelLegend({ prizes }: WheelLegendProps) {
   return (
     <div className="space-y-2">
       {prizes.map((prize, index) => {
-        const color = getSectorColor(index, prize.color);
+        const color = getPrizeColor(index, prize.color);
         return (
           <div
             key={prize.id}
-            className="flex items-center gap-3 rounded-lg border border-dark-700/30 bg-dark-800/50 p-2.5 transition-colors hover:bg-dark-800"
+            className="flex items-center gap-3 rounded-xl p-2.5 transition-all hover:brightness-125"
+            style={{
+              background: `linear-gradient(160deg, ${color}40 0%, ${color}1a 100%)`,
+              border: `1px solid ${color}`,
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+            }}
           >
-            {/* Color indicator */}
-            <div className="h-8 w-1 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-
-            {/* Emoji */}
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center text-xl">
+            {/* Эмодзи */}
+            <div
+              className="flex h-9 w-9 shrink-0 items-center justify-center"
+              style={{
+                fontSize: '22px',
+                lineHeight: 1,
+              }}
+            >
               {prize.emoji}
             </div>
 
-            {/* Prize name */}
+            {/* Название */}
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium text-dark-100">{prize.display_name}</div>
+              <div className="truncate text-sm font-medium text-white">{prize.display_name}</div>
             </div>
           </div>
         );

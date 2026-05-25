@@ -36,19 +36,19 @@
     "dashboard": "Главная",
     "subscription": "Подписка",
     "balance": "Баланс",
-    "referral": "Рефералы",
+    "referral": "Приглашенные",
     "support": "Поддержка",
     "profile": "Профиль",
     "logout": "Выйти",
     "contests": "Конкурсы",
     "polls": "Опросы",
     "info": "Информация",
-    "wheel": "Колесо удачи",
+    "wheel": "Барабан призов",
     "menu": "Меню",
     "gift": "Подарить"
   },
   "notifications": {
-    "ticketNotifications": "Уведомления о тикетах",
+    "ticketNotifications": "Уведомления об обращениях",
     "markAllRead": "Прочитать все",
     "noNotifications": "Нет уведомлений",
     "justNow": "Только что",
@@ -64,14 +64,14 @@
     "daysAgo_one": "{{count}} д. назад",
     "daysAgo_few": "{{count}} д. назад",
     "daysAgo_many": "{{count}} д. назад",
-    "viewAll": "Все тикеты",
+    "viewAll": "Все обращения",
     "newNotification": "Новое уведомление",
     "clickToView": "Нажмите для просмотра",
-    "newTicket": "Новый тикет: {{title}}",
-    "newReply": "Новый ответ в тикете: {{title}}",
-    "newTicketTitle": "Новый тикет",
+    "newTicket": "Новое обращение: {{title}}",
+    "newReply": "Новый ответ в обращении: {{title}}",
+    "newTicketTitle": "Новое обращение",
     "newReplyTitle": "Новый ответ",
-    "newUserReply": "Ответ пользователя в тикете: {{title}}",
+    "newUserReply": "Ответ пользователя в обращении: {{title}}",
     "newUserReplyTitle": "Ответ пользователя"
   },
   "campaignBonus": {
@@ -120,10 +120,10 @@
       "warningMessage": "Вы получили предупреждение"
     },
     "referral": {
-      "bonusTitle": "Реферальный бонус",
-      "bonusMessage": "Вы получили реферальный бонус {{amount}} {{currency}}!",
-      "bonusWithName": "Вы получили бонус {{amount}} {{currency}} от {{name}}!",
-      "registeredTitle": "Новый реферал",
+      "bonusTitle": "Бонус лояльности",
+      "bonusMessage": "Вы получили бонус по программе лояльности {{amount}} {{currency}}!",
+      "bonusWithName": "Вы получили бонус по программе лояльности {{amount}} {{currency}} от {{name}}!",
+      "registeredTitle": "Новый приглашенный пользователь",
       "registeredMessage": "Кто-то зарегистрировался по вашей ссылке!",
       "registeredWithName": "{{name}} зарегистрировался по вашей ссылке!"
     },
@@ -189,7 +189,7 @@
     "welcomeBack": "Добро пожаловать!",
     "loginTitle": "Вход в личный кабинет",
     "loginSubtitle": "Войдите через Telegram или используйте email",
-    "referralInvite": "Вы приглашены по реферальной ссылке!",
+    "referralInvite": "Вы приглашены по специальной ссылке!",
     "passwordMismatch": "Пароли не совпадают",
     "passwordTooShort": "Пароль должен быть минимум 8 символов",
     "invalidEmail": "Введите корректный email адрес",
@@ -301,7 +301,7 @@
     "stats": {
       "balance": "Баланс",
       "subscription": "Подписка",
-      "referrals": "Рефералы",
+      "referrals": "Приглашенные пользователи",
       "earnings": "Заработок"
     }
   },
@@ -744,7 +744,7 @@
     "deposit": "Пополнение",
     "withdrawal": "Списание",
     "subscriptionPayment": "Оплата подписки",
-    "referralReward": "Реферальный бонус",
+    "referralReward": "Вознаграждение за приглашение",
     "minAmount": "Мин.",
     "maxAmount": "Макс.",
     "notAvailable": "Недоступно",
@@ -830,8 +830,8 @@
     }
   },
   "referral": {
-    "title": "Реферальная программа",
-    "yourLink": "Ваши реферальные ссылки",
+    "title": "Программа лояльности",
+    "yourLink": "Ваши ссылки для приглашения",
     "botLink": "Ссылка на бота",
     "cabinetLink": "Ссылка на кабинет",
     "copyLink": "Копировать",
@@ -840,7 +840,7 @@
     "shareMessage": "Заходи в {{botName}} по моей ссылке и получай до {{percent}}% кешбэка!",
     "shareHint": "Поделитесь ссылкой с друзьями. Когда они зарегистрируются и оплатят, вы получите {{percent}}% комиссии!",
     "stats": {
-      "totalReferrals": "Всего рефералов",
+      "totalReferrals": "Всего приглашенных",
       "activeReferrals": "Активных",
       "totalEarnings": "Общий заработок",
       "commissionRate": "Комиссия"
@@ -852,10 +852,10 @@
       "newUserBonus": "Бонус новому пользователю",
       "inviterBonus": "Бонус пригласившему"
     },
-    "yourReferrals": "Ваши рефералы",
-    "noReferrals": "Пока нет рефералов. Поделитесь ссылкой, чтобы пригласить друзей!",
+    "yourReferrals": "Ваши приглашенные",
+    "noReferrals": "Пока никто не присоединился. Поделитесь ссылкой, чтобы пригласить друзей!",
     "anonymousUser": "Пользователь #{{id}}",
-    "anonymousReferral": "Реферал",
+    "anonymousReferral": "Пользователь",
     "user": "Пользователь",
     "joined": "Присоединился",
     "hasPaid": "Оплатил",
@@ -866,13 +866,13 @@
     "earningsHistory": "История начислений",
     "reason": "Причина",
     "reasons": {
-      "referral_registration_pending": "Регистрация реферала",
-      "referral_registration": "Регистрация реферала",
-      "referral_first_payment": "Первая оплата реферала",
-      "referral_subscription_renewal": "Продление подписки реферала",
-      "referral_bonus": "Бонус за реферала"
+      "referral_registration_pending": "Регистрация по приглашению",
+      "referral_registration": "Регистрация по приглашению",
+      "referral_first_payment": "Первая оплата приглашенного",
+      "referral_subscription_renewal": "Продление подписки приглашенного",
+      "referral_bonus": "Бонус за друга"
     },
-    "disabled": "Реферальная программа временно отключена",
+    "disabled": "Программа лояльности временно отключена",
     "partner": {
       "becomePartner": "Стать партнером",
       "becomePartnerDesc": "Подайте заявку на партнерскую программу, чтобы получить повышенную комиссию и возможность вывода заработка.",
@@ -896,7 +896,7 @@
         "web": "Ссылка в кабинет"
       },
       "campaignBonus": {
-        "title": "Бонус для реферала",
+        "title": "Бонус для приглашенного",
         "balance": "+{{amount}} на баланс",
         "balanceDesc": "{{amount}} на баланс при регистрации",
         "subscription": "{{days}} дн. подписки",
@@ -906,7 +906,7 @@
       },
       "stats": {
         "registrations": "Регистрации",
-        "referrals": "Рефералы",
+        "referrals": "Приглашенные",
         "earnings": "Заработок",
         "conversionRate": "Конверсия",
         "today": "Сегодня",
@@ -915,15 +915,15 @@
         "showDetails": "Подробнее",
         "hideDetails": "Свернуть",
         "vsLastWeek": "vs прошлая неделя",
-        "topReferrals": "Топ рефералы",
+        "topReferrals": "Лидеры программы",
         "noData": "Нет данных",
         "dailyChart": "Динамика за 30 дней",
         "periodComparison": "Сравнение периодов",
-        "noReferrals": "Пока нет рефералов",
+        "noReferrals": "Пока приглашенных нет",
         "paid": "Оплатил",
         "pending": "Ожидание",
         "active": "Активен",
-        "referralsCount": "Рефералов",
+        "referralsCount": "Приглашенных",
         "earningsAmount": "Заработано"
       },
       "fields": {
@@ -935,7 +935,7 @@
         "websiteUrlPlaceholder": "https://example.com",
         "description": "Описание",
         "descriptionPlaceholder": "Расскажите о вашей аудитории и планах продвижения...",
-        "expectedReferrals": "Ожидаемое количество рефералов в месяц",
+        "expectedReferrals": "Ожидаемое количество приглашений в месяц",
         "expectedReferralsPlaceholder": "Примерное количество в месяц",
         "desiredCommission": "Желаемый процент комиссии",
         "desiredCommissionPlaceholder": "От 1 до 100%"
@@ -976,7 +976,7 @@
   },
   "support": {
     "title": "Поддержка",
-    "newTicket": "Новый тикет",
+    "newTicket": "Новое обращение",
     "yourTickets": "Ваши обращения",
     "noTickets": "Нет обращений",
     "createTicket": "Создать обращение",
@@ -1007,7 +1007,7 @@
     "uploadFailed": "Не удалось загрузить изображение",
     "imageLoadFailed": "Не удалось загрузить изображение",
     "tooManyRequests": "Слишком много запросов. Подождите {{seconds}} сек.",
-    "ticketsDisabled": "Тикеты отключены",
+    "ticketsDisabled": "Обращения отключены",
     "useProfile": "Для получения поддержки перейдите в профиль бота",
     "goToProfile": "Перейти в профиль",
     "useExternalLink": "Для получения поддержки воспользуйтесь внешней ссылкой",
@@ -1016,8 +1016,8 @@
     "contactUs": "Связаться с поддержкой"
   },
   "wheel": {
-    "title": "Колесо удачи",
-    "disabled": "Колесо удачи временно недоступно",
+    "title": "Барабан призов",
+    "disabled": "Барабан призов временно недоступен",
     "prizes": "Призы",
     "spinsRemaining": "Осталось вращений сегодня",
     "choosePayment": "Выберите способ оплаты",
@@ -1041,13 +1041,13 @@
     "close": "Закрыть",
     "errors": {
       "networkError": "Произошла ошибка сети",
-      "loadFailed": "Не удалось загрузить конфигурацию колеса",
+      "loadFailed": "Не удалось загрузить конфигурацию барабана",
       "dailyLimitReached": "Достигнут дневной лимит вращений",
       "cannotSpin": "Сейчас нельзя крутить",
       "insufficientBalance": "Недостаточно средств на балансе",
       "topUpRequired": "Пополните баланс для оплаты спина",
       "starsNotAvailable": "Оплата Stars недоступна. Откройте приложение через Telegram.",
-      "noSubscription": "Для вращения колеса необходима активная подписка. Активируйте подписку в разделе «Подписка»."
+      "noSubscription": "Для вращения барабана необходима активная подписка. Активируйте подписку в разделе «Подписка»."
     },
     "payWithStars": "Оплатить Stars",
     "payWithDays": "Оплатить днями",
@@ -1057,15 +1057,15 @@
     "starsPaymentFailed": "Ошибка оплаты. Попробуйте еще раз.",
     "starsPaymentRedirected": "Откроется Telegram для оплаты. После оплаты обновите страницу.",
     "starsNotAvailable": "Оплата звёздами сейчас недоступна. Обратитесь в поддержку.",
-    "confirmStarsPayment": "Вы будете перенаправлены в Telegram для оплаты одного вращения колеса.",
+    "confirmStarsPayment": "Вы будете перенаправлены в Telegram для оплаты одного вращения барабана.",
     "payStars": "Оплатить {{count}} ⭐",
     "youWon": "Вы выиграли",
     "noPrize": "В этот раз не повезло...",
     "noHistory": "История вращений пуста",
     "banner": {
       "title": "Испытай удачу!",
-      "description": "Крути колесо и выигрывай призы: дни подписки, баланс, трафик и многое другое!",
-      "button": "Перейти к колесу"
+      "description": "Вращай барабан и выигрывай призы: дни подписки, баланс, трафик и многое другое!",
+      "button": "Перейти к бабабану призов"
     }
   },
   "admin": {
@@ -1162,10 +1162,10 @@
     "nav": {
       "title": "Админка",
       "dashboard": "Статистика",
-      "tickets": "Тикеты",
+      "tickets": "Обращения",
       "settings": "Настройки",
       "apps": "Приложения",
-      "wheel": "Колесо",
+      "wheel": "Барабан",
       "tariffs": "Тарифы",
       "servers": "Сквады",
       "banSystem": "Мониторинг банов",
@@ -1191,7 +1191,7 @@
       "auditLog": "Журнал аудита",
       "salesStats": "Статистика продаж",
       "landings": "Лендинги",
-      "referralNetwork": "Реферальная сеть",
+      "referralNetwork": "Сеть приглашений",
       "news": "Новости",
       "bulkActions": "Массовые действия",
       "infoPages": "Инфо-страницы"
@@ -1214,7 +1214,7 @@
       "ticketsDesc": "Обработка обращений пользователей",
       "settingsDesc": "Настройки системы и параметры",
       "appsDesc": "Управление приложениями для подключения",
-      "wheelDesc": "Настройка колеса удачи и призов",
+      "wheelDesc": "Настройка барабана призов",
       "tariffsDesc": "Управление тарифными планами",
       "serversDesc": "Настройка VPN серверов",
       "banSystemDesc": "Мониторинг банов и нарушений",
@@ -1240,7 +1240,7 @@
       "auditLogDesc": "Просмотр активности системы и истории доступа",
       "salesStatsDesc": "Аналитика продаж и тренды",
       "landingsDesc": "Страницы быстрой покупки",
-      "referralNetworkDesc": "Визуализация графа рефералов и РК",
+      "referralNetworkDesc": "Визуализация графа связей и РК",
       "newsDesc": "Управление новостями и статьями"
     },
     "salesStats": {
@@ -1324,8 +1324,8 @@
       "loadError": "Не удалось загрузить статистику"
     },
     "referralNetwork": {
-      "title": "Реферальная сеть",
-      "subtitle": "Визуализация графа рефералов и рекламных кампаний",
+      "title": "Сеть связей",
+      "subtitle": "Визуализация графа приглашений и рекламных кампаний",
       "search": {
         "placeholder": "Поиск по TG ID, @username, email, кампании...",
         "noResults": "Ничего не найдено",
@@ -1336,24 +1336,24 @@
         "title": "Фильтры",
         "campaigns": "Кампании",
         "partnersOnly": "Только партнёры",
-        "minReferrals": "Мин. рефералов",
+        "minReferrals": "Мин. приглашенных",
         "reset": "Сбросить"
       },
       "stats": {
         "totalUsers": "Пользователей",
-        "totalReferrers": "Рефереров",
+        "totalReferrers": "Пригласивших участников",
         "totalCampaigns": "Кампаний",
         "subscriptionRevenue": "Доход с подписок",
-        "totalEarnings": "Реф. доход"
+        "totalEarnings": "Бонусный доход"
       },
       "legend": {
         "title": "Легенда",
         "fillTitle": "Подписка",
-        "borderTitle": "Роль реферера",
+        "borderTitle": "Роль пригласившего",
         "regularUser": "Без подписки",
-        "activeReferrer": "Активный реферер",
+        "activeReferrer": "Активный участник",
         "partner": "Партнёр",
-        "topReferrer": "Топ-реферер (10+)",
+        "topReferrer": "Топ-пригласитель (10+)",
         "campaignUser": "Из кампании",
         "partnerCampaignEdge": "Партнёр → РК",
         "campaignNode": "Рекламная кампания",
@@ -1371,8 +1371,8 @@
         "noSubscription": "Нет подписки",
         "personalStats": "Личная статистика",
         "totalSpent": "Оплачено всего",
-        "referralEarnings": "Реф. доход",
-        "referralBranch": "Реферальная ветка",
+        "referralEarnings": "Доход от приглашений",
+        "referralBranch": "Ветка приглашений",
         "directReferrals": "Привёл людей",
         "branchSize": "Всего в ветке",
         "branchRevenue": "Доход ветки",
@@ -1396,7 +1396,7 @@
         "totalRevenue": "Общий доход",
         "conversionRate": "Конверсия",
         "avgCheck": "Средний чек",
-        "topReferrers": "Топ-рефереры из кампании"
+        "topReferrers": "Топ пригласивших из кампании"
       },
       "controls": {
         "zoomIn": "Приблизить",
@@ -1689,7 +1689,7 @@
       }
     },
     "wheel": {
-      "title": "Настройки колеса удачи",
+      "title": "Настройки барабана призов",
       "enabled": "Включено",
       "disabled": "Выключено",
       "tabs": {
@@ -1699,8 +1699,8 @@
       },
       "preview": "Предпросмотр",
       "settings": {
-        "enableWheel": "Включить колесо",
-        "allowSpins": "Разрешить пользователям крутить колесо",
+        "enableWheel": "Включить барабан удачи",
+        "allowSpins": "Разрешить пользователям крутить барабан",
         "spinCost": "Стоимость вращения",
         "costInStars": "Стоимость в Stars",
         "costInDays": "Стоимость в днях",
@@ -1715,7 +1715,7 @@
       "prizes": {
         "addPrize": "Добавить приз",
         "editPrize": "Редактировать приз",
-        "noPrizes": "Призы не настроены. Добавьте призы для активации колеса.",
+        "noPrizes": "Призы не настроены. Добавьте призы для активации барабана.",
         "deletePrize": "Удалить приз",
         "confirmDelete": "Вы уверены, что хотите удалить этот приз? Это действие нельзя отменить.",
         "dragToReorder": "Перетащите для изменения порядка",
@@ -2067,7 +2067,7 @@
         "iface_skip": "Пропуск шагов",
         "iface_additional": "Дополнительно",
         "users_support": "Поддержка",
-        "users_referral": "Реферальная система",
+        "users_referral": "Программа лояльности",
         "users_channel": "Канал",
         "users_localization": "Локализация",
         "users_moderation": "Модерация",
@@ -2097,7 +2097,8 @@
         "violet": "Фиолет",
         "rose": "Роза",
         "midnight": "Полночь",
-        "turquoise": "Бирюза"
+        "turquoise": "Бирюза",
+        "nunk": "NUNK SPACE"
       },
       "colors": {
         "background": "Фон",
@@ -2109,7 +2110,7 @@
         "error": "Ошибка"
       },
       "settingNames": {
-        "Skip Referral Code": "Пропуск реф. кода",
+        "Skip Referral Code": "Без кода приглашения",
         "Skip Rules Accept": "Пропуск правил",
         "Connect Button Happ Download Enabled": "Кнопка скачивания Happ",
         "Happ Cryptolink Redirect Template": "Шаблон редиректа",
@@ -2128,7 +2129,7 @@
         "Miniapp Static Path": "Путь к статике",
         "Miniapp Support Type": "Тип поддержки",
         "Miniapp Support Url": "URL поддержки",
-        "Miniapp Tickets Enabled": "Тикеты",
+        "Miniapp Tickets Enabled": "Обращения",
         "Bot Name": "Название бота",
         "Logo Letter": "Буква логотипа",
         "Branding Name": "Название бренда",
@@ -2298,8 +2299,8 @@
         "Support Enabled": "Поддержка",
         "Support Username": "Username поддержки",
         "Support Url": "URL поддержки",
-        "Referral Enabled": "Рефералы",
-        "Referral Percent": "Процент рефералов",
+        "Referral Enabled": "Программа активна",
+        "Referral Percent": "Процент вознаграждения",
         "Referral Min Topup": "Мин. пополнение",
         "Moderation Enabled": "Модерация",
         "Channel Required": "Требуется канал",
@@ -2391,7 +2392,7 @@
         "Interface Language": "Язык интерфейса",
         "Interface Theme": "Тема интерфейса",
         "Show Balance": "Показывать баланс",
-        "Show Referral": "Показывать рефералы",
+        "Show Referral": "Показывать приглашенных",
         "Show Support": "Показывать поддержку",
         "Show Profile": "Показывать профиль",
         "Menu Style": "Стиль меню",
@@ -2402,7 +2403,7 @@
         "Admin Notifications Chat Id": "ID чата уведомлений",
         "Admin Notifications Enabled": "Уведомления админов",
         "Admin Notifications Nalog Topic Id": "ID топика налогов",
-        "Admin Notifications Ticket Topic Id": "ID топика тикетов",
+        "Admin Notifications Ticket Topic Id": "ID топика обращений",
         "Admin Notifications Topic Id": "ID топика",
         "Enable Notifications": "Уведомления",
         "Notification Cache Hours": "Кэш уведомлений (час)",
@@ -2425,18 +2426,18 @@
         "Language Selection Enabled": "Выбор языка",
         "Locales Path": "Путь к локалям",
         "Referral Commission Percent": "Комиссия (%)",
-        "Referral Contests Enabled": "Конкурсы рефералов",
+        "Referral Contests Enabled": "Конкурсы программы лояльности",
         "Referral First Topup Bonus Kopeks": "Бонус новичку (коп.)",
         "Referral Inviter Bonus Kopeks": "Бонус пригласившему (коп.)",
         "Referral Minimum Topup Kopeks": "Мин. пополнение (коп.)",
-        "Referral Notifications Enabled": "Уведомления рефералов",
+        "Referral Notifications Enabled": "Уведомления о приглашениях",
         "Referral Notification Retry Attempts": "Попытки уведомлений",
-        "Referral Program Enabled": "Реферальная программа",
+        "Referral Program Enabled": "Программа лояльности включена",
         "Referral Withdrawal Cooldown Days": "Кулдаун вывода (дни)",
         "Referral Withdrawal Enabled": "Вывод средств",
         "Referral Withdrawal Min Amount Kopeks": "Мин. сумма вывода (коп.)",
         "Referral Withdrawal Notifications Topic Id": "ID топика уведомлений",
-        "Referral Withdrawal Only Referral Balance": "Только реферальный баланс",
+        "Referral Withdrawal Only Referral Balance": "Только бонусный баланс",
         "Referral Withdrawal Suspicious Max Deposits Per Month": "Макс. депозитов в месяц",
         "Referral Withdrawal Suspicious Min Deposit Kopeks": "Мин. подозр. депозит (коп.)",
         "Referral Withdrawal Suspicious No Purchases Ratio": "Коэф. без покупок",
@@ -2444,7 +2445,7 @@
         "Support Menu Enabled": "Меню поддержки",
         "Support System Mode": "Режим поддержки",
         "Support Ticket Sla Check Interval Seconds": "Интервал проверки SLA (сек)",
-        "Support Ticket Sla Enabled": "SLA тикетов",
+        "Support Ticket Sla Enabled": "SLA обращений",
         "Support Ticket Sla Minutes": "Время SLA (мин)",
         "Support Ticket Sla Reminder Cooldown Minutes": "Кулдаун напоминания (мин)",
         "Channel Disable Trial On Unsubscribe": "Отключить триал при отписке",
@@ -2595,7 +2596,7 @@
         "LOCALIZATION": "Локализация",
         "CHANNEL": "Канал",
         "TIMEZONE": "Часовой пояс",
-        "REFERRAL": "Реферальная система",
+        "REFERRAL": "Программа лояльности",
         "MODERATION": "Модерация"
       },
       "offlineConv": "Офлайн-конверсии",
@@ -2615,7 +2616,7 @@
         "home": "Главная",
         "subscription": "Подписка",
         "balance": "Баланс",
-        "referral": "Рефералы",
+        "referral": "Приглашенные",
         "support": "Поддержка",
         "info": "Информация",
         "admin": "Админка",
@@ -2625,7 +2626,7 @@
         "home": "Кнопка личного кабинета",
         "subscription": "Управление подпиской",
         "balance": "Пополнение и баланс",
-        "referral": "Реферальная программа",
+        "referral": "Программа лояльности",
         "support": "Обращения в поддержку",
         "info": "Информационный раздел",
         "admin": "Веб-админка",
@@ -2708,11 +2709,11 @@
       "availableConfigs": "Доступные конфигурации"
     },
     "tickets": {
-      "title": "Управление тикетами",
+      "title": "Управление обращениями",
       "total": "Всего",
-      "list": "Тикеты",
-      "noTickets": "Нет тикетов",
-      "selectTicket": "Выберите тикет из списка",
+      "list": "Обращения",
+      "noTickets": "Нет обращений",
+      "selectTicket": "Выберите обращение из списка",
       "allStatuses": "Все статусы",
       "statusOpen": "Открыт",
       "statusPending": "Ожидает",
@@ -2733,20 +2734,20 @@
       "uploading": "Загрузка...",
       "uploadComplete": "Загружено",
       "settings": "Настройки",
-      "settingsSubtitle": "Настройка тикетной системы и SLA",
+      "settingsSubtitle": "Настройка системы обращений и SLA",
       "settingsLoadError": "Не удалось загрузить настройки",
       "supportMode": "Режим поддержки",
       "supportModeDesc": "Выберите, как пользователи могут связаться с поддержкой",
-      "modeBoth": "Тикеты и контакт",
-      "modeTickets": "Только тикеты",
+      "modeBoth": "Обращения и контакт",
+      "modeTickets": "Только обращения",
       "modeContact": "Только контакт",
       "slaSettings": "Настройки SLA",
       "slaEnabled": "Включить SLA (мониторинг времени ответа)",
-      "slaEnabledDesc": "Автоматические уведомления о просроченных тикетах",
+      "slaEnabledDesc": "Автоматические уведомления о просроченных обращениях",
       "slaMinutes": "Время ответа (минуты)",
-      "slaMinutesDesc": "Максимальное время для ответа на тикет (1-1440 минут)",
+      "slaMinutesDesc": "Максимальное время для ответа на обращение (1-1440 минут)",
       "checkInterval": "Интервал проверки (секунды)",
-      "checkIntervalDesc": "Как часто проверять просроченные тикеты (30-600 секунд)",
+      "checkIntervalDesc": "Как часто проверять просроченные обращения (30-600 секунд)",
       "reminderCooldown": "Интервал напоминаний (минуты)",
       "reminderCooldownDesc": "Минимальное время между напоминаниями (1-120 минут)",
       "settingsUpdateError": "Ошибка сохранения настроек",
@@ -2756,7 +2757,7 @@
       "userNotificationsEnabled": "Уведомления для пользователей",
       "userNotificationsEnabledDesc": "Отправлять уведомления пользователям об ответах админа",
       "adminNotificationsEnabled": "Уведомления для админов",
-      "adminNotificationsEnabledDesc": "Отправлять уведомления админам о новых тикетах и ответах"
+      "adminNotificationsEnabledDesc": "Отправлять уведомления админам о новых обращениях и ответах"
     },
     "tariffs": {
       "title": "Управление тарифами",
@@ -3119,7 +3120,7 @@
         "username": "Имя пользователя",
         "telegramId": "Telegram ID",
         "balance": "Баланс",
-        "totalReferrals": "Всего рефералов",
+        "totalReferrals": "Всего приглашенных",
         "totalEarnings": "Общий заработок",
         "requestedAmount": "Запрошенная сумма",
         "createdAt": "Создано",
@@ -3135,8 +3136,8 @@
         },
         "flags": "Флаги",
         "balanceStats": "Статистика баланса",
-        "referralDeposits": "Депозиты рефералов",
-        "suspiciousReferrals": "Подозрительные рефералы",
+        "referralDeposits": "Депозиты приглашенных",
+        "suspiciousReferrals": "Подозрительные регистрации",
         "earningsByReason": "Доходы по причинам",
         "adminComment": "Комментарий администратора",
         "processedAt": "Обработано",
@@ -3157,7 +3158,7 @@
       "subtitle": "Управление партнёрами и заявками",
       "totalPartners": "Всего партнёров",
       "pendingApplications": "Заявок на рассмотрении",
-      "totalReferrals": "Всего рефералов",
+      "totalReferrals": "Всего приглашенных",
       "totalEarnings": "Всего заработано",
       "tabs": {
         "partners": "Партнёры",
@@ -3166,7 +3167,7 @@
       "noPartners": "Партнёров пока нет",
       "noApplications": "Нет заявок на рассмотрении",
       "commission": "{{percent}}% комиссия",
-      "referrals": "{{count}} рефералов",
+      "referrals": "{{count}} приглашенных",
       "actions": {
         "approve": "Одобрить",
         "reject": "Отклонить",
@@ -3177,7 +3178,7 @@
         "website": "Сайт",
         "channel": "Канал",
         "description": "Описание",
-        "expectedReferrals": "Ожидаемых рефералов/мес",
+        "expectedReferrals": "Ожидаемых приглашений/мес",
         "desiredCommission": "Желаемая комиссия"
       },
       "approveDialog": {
@@ -3196,16 +3197,16 @@
       "settingsLoadError": "Не удалось загрузить настройки",
       "settingsUpdateError": "Не удалось сохранить настройки",
       "settingsSection": {
-        "referralProgram": "Реферальная программа",
+        "referralProgram": "Программа лояльности",
         "withdrawalSettings": "Настройки вывода"
       },
       "settingsFields": {
-        "programEnabled": "Реферальная программа включена",
-        "programEnabledDesc": "Вкл/выкл реферальную программу для всех пользователей",
+        "programEnabled": "Программа лояльности включена",
+        "programEnabledDesc": "Вкл/выкл программу лояльности для всех пользователей",
         "partnerVisible": "Раздел партнёрки виден в кабинете",
         "partnerVisibleDesc": "Показывать/скрывать секцию подачи заявки на партнёрство и вывода средств",
         "withdrawalEnabled": "Вывод средств включён",
-        "withdrawalEnabledDesc": "Разрешить партнёрам запрашивать вывод реферального баланса",
+        "withdrawalEnabledDesc": "Разрешить партнерам вывод вознаграждений",
         "minAmount": "Мин. сумма вывода (копейки)",
         "minAmountDesc": "Минимальная сумма для запроса вывода (100 коп. = 1 ₽)",
         "cooldownDays": "Кулдаун между выводами (дни)",
@@ -3225,7 +3226,7 @@
         "none": "Не партнёр"
       },
       "stats": {
-        "totalReferrals": "Всего рефералов",
+        "totalReferrals": "Всего приглашенных",
         "paidReferrals": "Оплативших",
         "activeReferrals": "Активных",
         "conversionRate": "Конверсия"
@@ -3267,7 +3268,7 @@
       },
       "revokeDialog": {
         "title": "Отозвать статус партнёра?",
-        "description": "Это лишит партнёра привилегий. Партнёр больше не будет получать комиссию от рефералов."
+        "description": "Это лишит участника привилегий. Он больше не будет получать комиссию от приглашенных."
       }
     },
     "promocodes": {
@@ -3537,12 +3538,12 @@
           "subscription": "Подписка",
           "balance": "Баланс",
           "sync": "Синхронизация",
-          "tickets": "Тикеты",
+          "tickets": "Обращения",
           "gifts": "Подарки",
-          "referrals": "Рефералы"
+          "referrals": "Приглашенные"
         },
-        "noTickets": "У пользователя нет тикетов",
-        "ticketsCount": "тикетов",
+        "noTickets": "У пользователя нет обращений",
+        "ticketsCount": "обращений",
         "messagesCount": "сообщений",
         "status": "Статус",
         "language": "Язык",
@@ -3565,8 +3566,8 @@
         "totalSpent": "Всего потрачено",
         "purchases": "Покупок",
         "campaign": "Рекламная кампания",
-        "referralsList": "Список рефералов",
-        "noReferrals": "Нет рефералов",
+        "referralsList": "Список приглашенных",
+        "noReferrals": "Нет приглашенных",
         "panelConfig": "Конфигурация панели",
         "trojanPassword": "Trojan пароль",
         "vlessUuid": "VLESS UUID",
@@ -3592,8 +3593,8 @@
           "renamed": "Имя устройства обновлено"
         },
         "referral": {
-          "title": "Реферальная программа",
-          "referrals": "Рефералов",
+          "title": "Программа лояльности",
+          "referrals": "Приглашенных",
           "earned": "Заработано",
           "commission": "Комиссия",
           "default": "По умолч.",
@@ -3718,24 +3719,24 @@
         },
         "referrals": {
           "referredBy": "Приглашён",
-          "noReferrer": "Реферер не назначен",
-          "assignReferrer": "Назначить реферера",
+          "noReferrer": "Пригласивший не назначен",
+          "assignReferrer": "Назначить пригласившего",
           "removeReferrer": "Удалить",
-          "referrerAssigned": "Реферер назначен",
-          "referrerRemoved": "Реферер удалён",
-          "totalReferrals": "Всего рефералов",
+          "referrerAssigned": "Пригласивший назначен",
+          "referrerRemoved": "Пригласивший удалён",
+          "totalReferrals": "Всего приглашенных",
           "totalEarnings": "Всего заработано",
           "commission": "Комиссия",
-          "referralCode": "Реферальный код",
+          "referralCode": "Код приглашения",
           "default": "стандарт",
-          "referralsList": "Рефералы",
-          "noReferrals": "Рефералов пока нет",
-          "removeReferral": "Удалить реферала",
-          "referralRemoved": "Реферал удалён",
-          "addReferral": "Добавить реферала",
-          "referralAdded": "Реферал добавлен",
+          "referralsList": "Приглашенные",
+          "noReferrals": "Приглашенных пока нет",
+          "removeReferral": "Удалить приглашенного",
+          "referralRemoved": "Приглашенный удалён",
+          "addReferral": "Добавить приглашенного",
+          "referralAdded": "Приглашенный добавлен",
           "searchPlaceholder": "Поиск по имени, email или Telegram ID...",
-          "alreadyReferred": "уже чей-то реферал",
+          "alreadyReferred": "уже участвует в программе",
           "noUsersFound": "Пользователи не найдены"
         }
       }
@@ -4013,7 +4014,7 @@
         "permissions": "Разрешения",
         "permissionSections": {
           "users": "Пользователи",
-          "tickets": "Тикеты",
+          "tickets": "Обращения",
           "stats": "Статистика",
           "sales_stats": "Статистика продаж",
           "broadcasts": "Рассылки",
@@ -4034,7 +4035,7 @@
           "audit_log": "Журнал аудита",
           "channels": "Каналы",
           "ban_system": "Система банов",
-          "wheel": "Колесо фортуны",
+          "wheel": "Барабан удачи",
           "apps": "Приложения",
           "email_templates": "Шаблоны писем",
           "pinned_messages": "Закреплённые сообщения",
@@ -4065,7 +4066,7 @@
           "balance": "Баланс",
           "subscription": "Подписка",
           "send_offer": "Промо-предложение",
-          "referral": "Реф. процент"
+          "referral": "Процент вознаграждения"
         },
         "toggleSection": "Переключить все права {{section}}",
         "selectedPermissions_one": "{{count}} разрешение выбрано",
@@ -4274,7 +4275,7 @@
       },
       "resourceTypes": {
         "users": "Пользователи",
-        "tickets": "Тикеты",
+        "tickets": "Обращения",
         "roles": "Роли",
         "policies": "Политики",
         "settings": "Настройки",
@@ -4445,7 +4446,7 @@
       "title": "Информационные страницы",
       "subtitle": "Управление статическими информационными страницами",
       "create": "Создать страницу",
-      "createFaq": "Создать FAQ",
+      "createFaq": "Создать \"Частые вопросы\"",
       "edit": "Редактировать",
       "save": "Сохранить",
       "saving": "Сохранение...",
@@ -4471,7 +4472,7 @@
       },
       "replacesTabNone": "Не заменяет",
       "replacesTabOptions": {
-        "faq": "FAQ",
+        "faq": "Частые вопросы",
         "rules": "Правила",
         "privacy": "Конфиденциальность",
         "offer": "Оферта"
@@ -4481,11 +4482,11 @@
       "filter": {
         "all": "Все",
         "page": "Страницы",
-        "faq": "FAQ"
+        "faq": "Частые вопросы"
       },
       "pageTypes": {
         "page": "Страница",
-        "faq": "FAQ"
+        "faq": "Частые вопросы"
       },
       "faq": {
         "questions": "Вопросы и ответы",
@@ -4590,10 +4591,10 @@
       "noTariffs": "Нет тарифов"
     },
     "topReferrers": {
-      "title": "Топ рефералов",
-      "stats_one": "реф., {{count}} пригл.",
-      "stats_few": "реф., {{count}} пригл.",
-      "stats_many": "реф., {{count}} пригл.",
+      "title": "Топ участников",
+      "stats_one": "партнёр., {{count}} пригл.",
+      "stats_few": "партнёра., {{count}} пригл.",
+      "stats_many": "партнёров., {{count}} пригл.",
       "byEarnings": "По доходу",
       "byInvited": "По пригл.",
       "invites": "пригл.",
@@ -5071,7 +5072,7 @@
   },
   "info": {
     "title": "Информация",
-    "faq": "FAQ",
+    "faq": "Частые вопросы",
     "rules": "Правила",
     "privacy": "Конфиденциальность",
     "offer": "Оферта",

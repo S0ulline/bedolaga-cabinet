@@ -176,11 +176,11 @@ export function AppHeader({
     <>
       {/* Header - only on mobile */}
       <header
-        className="glass fixed left-0 right-0 top-0 z-50 shadow-lg shadow-black/10 lg:hidden"
+        className="fixed left-0 right-0 top-0 z-50 shadow-lg shadow-black/10 lg:hidden backdrop-blur-md border-b border-dark-700 border-opacity-30 bg-dark-900 bg-opacity-80"
         style={{
           paddingTop: isFullscreen
             ? `${Math.max(safeAreaInset.top, contentSafeAreaInset.top) + (telegramPlatform === 'android' ? 48 : 45)}px`
-            : undefined,
+            : 'env(safe-area-inset-top, 0px)', // ← добавить это
         }}
       >
         <div
@@ -194,7 +194,7 @@ export function AppHeader({
               onClick={() => setMobileMenuOpen(false)}
               className={cn('flex flex-shrink-0 items-center gap-2.5', !appName && 'mr-4')}
             >
-              <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-linear-lg border border-dark-700/50 bg-dark-800/80 shadow-md">
+              <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden">
                 <span
                   className={cn(
                     'absolute text-lg font-bold text-accent-400 transition-opacity duration-200',
