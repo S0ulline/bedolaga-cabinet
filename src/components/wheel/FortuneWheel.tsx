@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, memo } from 'react';
 import type { WheelPrize } from '../../api/wheel';
 
 interface FortuneWheelProps {
@@ -8,417 +8,497 @@ interface FortuneWheelProps {
   onSpinComplete: () => void;
 }
 
-// Pre-generate sparkle positions to avoid recalculating on each render
-const SPARKLE_POSITIONS = Array.from({ length: 8 }, (_, i) => ({
-  top: `${20 + ((i * 10) % 60)}%`,
-  left: `${15 + ((i * 13) % 70)}%`,
-  delay: `${i * 0.15}s`,
-}));
+// Геометрия вертикального барабана.
+// ITEM_HEIGHT — шаг сетки слотов, по которому считается математика спина.
+// Не менять — визуальный gap создаётся через padding внутри слота.
+const ITEM_HEIGHT = 96;
+const SLOT_GAP = 8;
+const VISIBLE_ITEMS = 3; // центр = выигрыш
+const REPEAT_COUNT = 30;
+const FULL_CYCLES = 6;
+
+// Фиолетовая палитра в тон UI
+const FALLBACK_COLORS = [
+  '#A855F7',
+  '#8B5CF6',
+  '#7C3AED',
+  '#9333EA',
+  '#C026D3',
+  '#A855F7',
+  '#8B5CF6',
+  '#7C3AED',
+];
+
+// Дефолтные акцентные цвета (фиолетовые) — для idle и spinning состояний
+const DEFAULT_ACCENT = '#A855F7';
+const DEFAULT_ACCENT_LIGHT = '#C084FC';
+const DEFAULT_ACCENT_PALE = '#E9D5FF';
+
+const getPrizeColor = (index: number, baseColor?: string) =>
+  baseColor || FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+
+/** Смешивает hex-цвет с белым на amount (0..1) — даёт «светлую» вариацию. */
+const lighten = (hex: string, amount: number): string => {
+  const m = hex.replace('#', '');
+  const r = parseInt(m.slice(0, 2), 16);
+  const g = parseInt(m.slice(2, 4), 16);
+  const b = parseInt(m.slice(4, 6), 16);
+  const lr = Math.round(r + (255 - r) * amount);
+  const lg = Math.round(g + (255 - g) * amount);
+  const lb = Math.round(b + (255 - b) * amount);
+  const toHex = (v: number) => v.toString(16).padStart(2, '0');
+  return `#${toHex(lr)}${toHex(lg)}${toHex(lb)}`;
+};
+
+/** HEX → "r, g, b" для rgba(...) */
+const hexToRgb = (hex: string): string => {
+  const m = hex.replace('#', '');
+  const r = parseInt(m.slice(0, 2), 16);
+  const g = parseInt(m.slice(2, 4), 16);
+  const b = parseInt(m.slice(4, 6), 16);
+  return `${r}, ${g}, ${b}`;
+};
 
 const FortuneWheel = memo(function FortuneWheel({
-  prizes,
-  isSpinning,
-  targetRotation,
-  onSpinComplete,
-}: FortuneWheelProps) {
-  const wheelRef = useRef<SVGGElement>(null);
-  const accumulatedRotation = useRef(0);
-  const [displayRotation, setDisplayRotation] = useState(0);
+                                                  prizes,
+                                                  isSpinning,
+                                                  targetRotation,
+                                                  onSpinComplete,
+                                                }: FortuneWheelProps) {
+  const stripRef = useRef<HTMLDivElement>(null);
 
+  const middleOffset =
+    prizes.length > 0 ? Math.floor(REPEAT_COUNT / 2) * prizes.length * ITEM_HEIGHT : 0;
+
+  const accumulatedOffset = useRef(middleOffset);
+  const [displayOffset, setDisplayOffset] = useState(middleOffset);
+  const [winFlash, setWinFlash] = useState(false);
+  const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
+
+  // Защита от двойного запуска: запоминаем targetRotation, для которого
+  // уже стартовал спин. Если useEffect триггернётся снова с тем же значением
+  // (например, родитель пересоздал onSpinComplete) — игнорируем.
+  // null = сейчас спин не идёт.
+  const activeSpinRotation = useRef<number | null>(null);
+
+  // Флаг: только что нормализовали смещение → следующий рендер без анимации.
+  const skipNextTransition = useRef(false);
+
+  // Свежий ref на onSpinComplete — чтобы не триггерить useEffect его пересозданием.
+  const onSpinCompleteRef = useRef(onSpinComplete);
   useEffect(() => {
-    if (isSpinning && targetRotation !== null && wheelRef.current) {
-      const currentPos = accumulatedRotation.current % 360;
-      let delta = targetRotation - currentPos;
-      // Normalize delta to positive
-      while (delta < 0) delta += 360;
-      const newRotation = accumulatedRotation.current + 1800 + delta;
-      accumulatedRotation.current = newRotation;
-      setDisplayRotation(newRotation);
+    onSpinCompleteRef.current = onSpinComplete;
+  }, [onSpinComplete]);
 
-      const timeout = setTimeout(() => {
-        onSpinComplete();
-      }, 5000);
+  // ── ЗАПУСК СПИНА ──
+  useEffect(() => {
+    if (!isSpinning || targetRotation === null || prizes.length === 0) return;
+    // Если для этого же targetRotation спин уже запущен — пропускаем.
+    if (activeSpinRotation.current === targetRotation) return;
 
-      return () => clearTimeout(timeout);
+    activeSpinRotation.current = targetRotation;
+    setWinFlash(false);
+    setWinnerIndex(null);
+
+    const sectorAngle = 360 / prizes.length;
+    // Сервер возвращает угол поворота колеса по часовой стрелке.
+    // Под указателем оказывается сектор, противоположный направлению вращения.
+    const normalizedAngle = (((360 - targetRotation) % 360) + 360) % 360;
+    const targetIndex = Math.floor(normalizedAngle / sectorAngle) % prizes.length;
+    const totalItems = prizes.length;
+
+    const currentItemPos = accumulatedOffset.current / ITEM_HEIGHT;
+    const currentIndexMod = ((Math.round(currentItemPos) % totalItems) + totalItems) % totalItems;
+
+    let deltaItems = targetIndex - currentIndexMod;
+    if (deltaItems < 0) deltaItems += totalItems;
+
+    const newItemPos = currentItemPos + FULL_CYCLES * totalItems + deltaItems;
+    const newOffset = newItemPos * ITEM_HEIGHT;
+
+    accumulatedOffset.current = newOffset;
+    setDisplayOffset(newOffset);
+
+    const spinTimeout = setTimeout(() => {
+      setWinnerIndex(targetIndex);
+      setWinFlash(true);
+      activeSpinRotation.current = null;
+      onSpinCompleteRef.current();
+
+      // Нормализация смещения к середине ленты без визуального скачка.
+      setTimeout(() => {
+        const period = totalItems * ITEM_HEIGHT;
+        const driftFromMiddle = accumulatedOffset.current - middleOffset;
+        const periodsToShift = Math.round(driftFromMiddle / period);
+
+        if (periodsToShift !== 0) {
+          const normalized = accumulatedOffset.current - periodsToShift * period;
+          skipNextTransition.current = true;
+          accumulatedOffset.current = normalized;
+          setDisplayOffset(normalized);
+        }
+      }, 0);
+    }, 5000);
+
+    return () => {
+      // ВАЖНО: при cleanup НЕ сбрасываем activeSpinRotation и НЕ чистим таймер.
+      // Если useEffect просто переоценился (родитель перерендерился) — таймер
+      // должен продолжать тикать, иначе onSpinComplete никогда не вызовется
+      // и кнопка зависнет. Cleanup при анмаунте компонента — мы и так не хотим
+      // вызывать setState после размонтирования, но spinTimeout сам отработает
+      // и React просто проигнорирует setState на размонтированном компоненте
+      // (выдаст ворнинг, но это безопаснее, чем зависший спин).
+      // Делаем cleanup пустым специально.
+      void spinTimeout;
+    };
+  }, [isSpinning, targetRotation, prizes.length, middleOffset]);
+
+  // После рендера сбрасываем флаг пропуска анимации
+  useLayoutEffect(() => {
+    if (skipNextTransition.current) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          skipNextTransition.current = false;
+        });
+      });
     }
-  }, [isSpinning, targetRotation, onSpinComplete]);
+  }, [displayOffset]);
+
+  // Win-эффект гаснет через 2.4s
+  useEffect(() => {
+    if (!winFlash) return;
+    const t = setTimeout(() => setWinFlash(false), 3000);
+    return () => clearTimeout(t);
+  }, [winFlash]);
 
   if (prizes.length === 0) {
     return (
-      <div className="mx-auto flex aspect-square w-full max-w-md items-center justify-center">
-        <p className="text-dark-400">No prizes configured</p>
+      <div
+        className="mx-auto flex w-full items-center justify-center"
+        style={{ height: `${ITEM_HEIGHT * VISIBLE_ITEMS}px` }}
+      >
+        <p className="text-sm text-neutral-500">No prizes configured</p>
       </div>
     );
   }
 
-  const size = 400;
-  const center = size / 2;
-  const outerRadius = size / 2 - 20;
-  const innerRadius = outerRadius - 15;
-  const prizeRadius = innerRadius - 5;
-  const sectorAngle = 360 / prizes.length;
-  const hubRadius = 45;
+  const stripItems = Array.from({ length: REPEAT_COUNT }, () => prizes).flat();
+  const stripHeight = stripItems.length * ITEM_HEIGHT;
+  const viewportHeight = VISIBLE_ITEMS * ITEM_HEIGHT;
 
-  const createSectorPath = (index: number) => {
-    const startAngle = (index * sectorAngle - 90) * (Math.PI / 180);
-    const endAngle = ((index + 1) * sectorAngle - 90) * (Math.PI / 180);
+  const baseShift = (viewportHeight - ITEM_HEIGHT) / 2;
+  const translateY = baseShift - displayOffset;
 
-    const x1 = center + prizeRadius * Math.cos(startAngle);
-    const y1 = center + prizeRadius * Math.sin(startAngle);
-    const x2 = center + prizeRadius * Math.cos(endAngle);
-    const y2 = center + prizeRadius * Math.sin(endAngle);
+  const stripTransition =
+    isSpinning && !skipNextTransition.current
+      ? 'transform 5s cubic-bezier(0.15, 0.6, 0.1, 1)'
+      : 'none';
 
-    const x1Inner = center + hubRadius * Math.cos(startAngle);
-    const y1Inner = center + hubRadius * Math.sin(startAngle);
-    const x2Inner = center + hubRadius * Math.cos(endAngle);
-    const y2Inner = center + hubRadius * Math.sin(endAngle);
-
-    const largeArc = sectorAngle > 180 ? 1 : 0;
-
-    return `M ${x1Inner} ${y1Inner}
-            L ${x1} ${y1}
-            A ${prizeRadius} ${prizeRadius} 0 ${largeArc} 1 ${x2} ${y2}
-            L ${x2Inner} ${y2Inner}
-            A ${hubRadius} ${hubRadius} 0 ${largeArc} 0 ${x1Inner} ${y1Inner} Z`;
-  };
-
-  // Position for emoji - closer to outer edge
-  const getEmojiPosition = (index: number) => {
-    const angle = (index * sectorAngle + sectorAngle / 2 - 90) * (Math.PI / 180);
-    const emojiRadius = prizeRadius * 0.75;
-    return {
-      x: center + emojiRadius * Math.cos(angle),
-      y: center + emojiRadius * Math.sin(angle),
-      rotation: index * sectorAngle + sectorAngle / 2,
-    };
-  };
-
-  // Alternate colors for sectors
-  const getSectorColors = (index: number, baseColor?: string) => {
-    if (baseColor) return baseColor;
-    const colors = [
-      '#8B5CF6',
-      '#EC4899',
-      '#3B82F6',
-      '#10B981',
-      '#F59E0B',
-      '#EF4444',
-      '#6366F1',
-      '#14B8A6',
-    ];
-    return colors[index % colors.length];
-  };
+  // ── АКЦЕНТНЫЕ ЦВЕТА ──
+  // При winFlash переключаемся на цвет приза, иначе — дефолтный фиолет.
+  const winnerBase =
+    winFlash && winnerIndex !== null
+      ? getPrizeColor(winnerIndex, prizes[winnerIndex]?.color)
+      : DEFAULT_ACCENT;
+  const accent = winnerBase;
+  const accentLight = winFlash ? lighten(winnerBase, 0.35) : DEFAULT_ACCENT_LIGHT;
+  const accentPale = winFlash ? lighten(winnerBase, 0.7) : DEFAULT_ACCENT_PALE;
+  const accentRgb = hexToRgb(accent);
+  const accentLightRgb = hexToRgb(accentLight);
 
   return (
-    <div className="relative mx-auto w-full max-w-[380px] select-none">
-      {/* Outer glow effect */}
+    <div
+      className="relative w-full select-none"
+      style={
+        {
+          ['--accent' as string]: accent,
+          ['--accent-light' as string]: accentLight,
+          ['--accent-pale' as string]: accentPale,
+          ['--accent-rgb' as string]: accentRgb,
+          ['--accent-light-rgb' as string]: accentLightRgb,
+        } as React.CSSProperties
+      }
+    >
+      <style>
+        {`
+          @keyframes nunkArrowPulse {
+            0%, 100% { opacity: 0.7; transform: translateY(-50%) translateX(0); }
+            50% { opacity: 1; transform: translateY(-50%) translateX(var(--nudge, 2px)); }
+          }
+          @keyframes nunkWinFlash {
+            0% { opacity: 0; transform: scale(0.95); }
+            15% { opacity: 1; transform: scale(1.02); }
+            100% { opacity: 0; transform: scale(1.08); }
+          }
+          @keyframes nunkWinGlow {
+            0%, 100% {
+              box-shadow:
+                inset 0 0 30px rgba(var(--accent-rgb), 0.4),
+                0 0 30px rgba(var(--accent-rgb), 0.5);
+            }
+            50% {
+              box-shadow:
+                inset 0 0 50px rgba(var(--accent-light-rgb), 0.65),
+                0 0 60px rgba(var(--accent-light-rgb), 0.75);
+            }
+          }
+          @keyframes nunkSparkle {
+            0% { transform: translate(0, 0) scale(0); opacity: 1; }
+            100% {
+              transform: translate(var(--dx), var(--dy)) scale(1);
+              opacity: 0;
+            }
+          }
+          .nunk-arrow { animation: nunkArrowPulse 2.4s ease-in-out infinite; }
+          .nunk-arrow-spinning { animation: nunkArrowPulse 0.5s ease-in-out infinite; }
+          .nunk-win-glow { animation: nunkWinGlow 1.2s ease-in-out infinite; }
+          .nunk-win-flash { animation: nunkWinFlash 1.2s ease-out forwards; }
+          .nunk-sparkle { animation: nunkSparkle 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+        `}
+      </style>
+
+      {/* Внешнее свечение — окрашивается в акцентный цвет */}
       <div
-        className={`absolute inset-[-30px] rounded-full transition-all duration-500 ${
-          isSpinning ? 'scale-105 opacity-100' : 'opacity-60'
+        className={`pointer-events-none absolute inset-[-24px] ${
+          isSpinning || winFlash ? 'opacity-100' : 'opacity-60'
         }`}
         style={{
           background:
-            'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(236, 72, 153, 0.2) 40%, transparent 70%)',
-          filter: 'blur(25px)',
+            'radial-gradient(ellipse at center, rgba(var(--accent-rgb), 0.3) 0%, rgba(var(--accent-rgb), 0.13) 50%, transparent 75%)',
+          filter: 'blur(34px)',
+          transition: 'opacity 0.5s ease, background 0.4s ease',
         }}
       />
 
-      {/* Pointer */}
-      <div className="absolute left-1/2 top-[-12px] z-20 -translate-x-1/2">
-        <div className="relative">
-          <div
-            className={`absolute inset-[-10px] blur-lg transition-opacity ${isSpinning ? 'opacity-100' : 'opacity-70'}`}
-            style={{
-              background: 'radial-gradient(circle, rgba(251, 191, 36, 0.9) 0%, transparent 60%)',
-            }}
-          />
-          <svg width="44" height="56" viewBox="0 0 44 56" className="relative drop-shadow-2xl">
+      {/* Корпус барабана — обводка корпуса в акцентном цвете */}
+      <div
+        className="relative w-full overflow-hidden rounded-2xl"
+        style={{
+          height: `${viewportHeight}px`,
+          background: 'linear-gradient(180deg, #0f0a1f 0%, #1a1230 50%, #0f0a1f 100%)',
+          boxShadow:
+            'inset 0 1px 0 rgba(var(--accent-light-rgb), 0.2), 0 20px 50px -15px rgba(0,0,0,0.7), 0 0 0 1px rgba(var(--accent-rgb), 0.55)',
+          transition: 'box-shadow 0.4s ease',
+        }}
+      >
+        {/* Подсветка центральной зоны */}
+        <div
+          className={`pointer-events-none absolute left-0 right-0 z-0 h-full ${
+            winFlash ? 'nunk-win-glow' : ''
+          }`}
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(var(--accent-rgb), 0.22) 0%, transparent 70%)',
+            transition: 'background 0.4s ease',
+          }}
+        />
+
+        {/* Лента призов */}
+        <div
+          ref={stripRef}
+          className="absolute left-0 top-0 w-full will-change-transform"
+          style={{
+            height: `${stripHeight}px`,
+            transform: `translate3d(0, ${translateY}px, 0)`,
+            transition: stripTransition,
+          }}
+        >
+          {stripItems.map((prize, index) => {
+            const localIndex = index % prizes.length;
+            const color = getPrizeColor(localIndex, prize.color);
+            const name =
+              (prize as { display_name?: string; name?: string }).display_name ??
+              (prize as { name?: string }).name ??
+              `Prize ${localIndex + 1}`;
+
+            return (
+              <div
+                key={`item-${index}`}
+                className="flex items-center px-4"
+                style={{
+                  height: `${ITEM_HEIGHT}px`,
+                  paddingTop: `${SLOT_GAP / 2}px`,
+                  paddingBottom: `${SLOT_GAP / 2}px`,
+                }}
+              >
+                <div
+                  className="flex h-full w-full flex-row items-center justify-center gap-1.5 rounded-xl p-2"
+                  style={{
+                    background: `linear-gradient(160deg, ${color}40 0%, ${color}1a 100%)`,
+                    border: `1px solid ${color}`,
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <div
+                    className="flex items-center justify-center"
+                    style={{ fontSize: '30px', lineHeight: 1 }}
+                  >
+                    {prize.emoji}
+                  </div>
+                  <span className="max-w-[80%] truncate text-sm font-medium text-white">
+                    {name}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Затухание сверху/снизу */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-10"
+          style={{
+            height: `${baseShift}px`,
+            background:
+              'linear-gradient(180deg, rgba(15, 10, 31, 0.92) 0%, rgba(15, 10, 31, 0.55) 60%, transparent 100%)',
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10"
+          style={{
+            height: `${baseShift}px`,
+            background:
+              'linear-gradient(0deg, rgba(15, 10, 31, 0.92) 0%, rgba(15, 10, 31, 0.55) 60%, transparent 100%)',
+          }}
+        />
+
+        {/* Левая стрелка — градиент в акцентном цвете */}
+        <div
+          className={`pointer-events-none absolute left-1 z-30 ${
+            isSpinning ? 'nunk-arrow-spinning' : 'nunk-arrow'
+          }`}
+          style={
+            {
+              top: `${baseShift + ITEM_HEIGHT / 2}px`,
+              transform: 'translateY(-50%)',
+              ['--nudge' as string]: '4px',
+            } as React.CSSProperties
+          }
+        >
+          <svg width="20" height="26" viewBox="0 0 20 26" fill="none">
             <defs>
-              <linearGradient id="pointerGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FDE68A" />
-                <stop offset="30%" stopColor="#FBBF24" />
-                <stop offset="70%" stopColor="#F59E0B" />
-                <stop offset="100%" stopColor="#D97706" />
+              <linearGradient id="nunkArrowLeftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                {/* stop-color через CSS-style, чтобы он реагировал на смену акцента
+                    с плавным transition. Атрибут stop-color этого не умеет. */}
+                <stop offset="0%" style={{ stopColor: accent, transition: 'stop-color 0.4s ease' }} />
+                <stop offset="50%" style={{ stopColor: accentLight, transition: 'stop-color 0.4s ease' }} />
+                <stop offset="100%" style={{ stopColor: accentPale, transition: 'stop-color 0.4s ease' }} />
               </linearGradient>
-              <filter id="pointerGlow">
-                <feDropShadow
-                  dx="0"
-                  dy="2"
-                  stdDeviation="3"
-                  floodColor="#F59E0B"
-                  floodOpacity="0.6"
-                />
+              <filter id="nunkArrowLeftGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="blur" />
+                <feFlood floodColor={accentLight} floodOpacity="0.9" />
+                <feComposite in2="blur" operator="in" result="glow" />
+                <feMerge>
+                  <feMergeNode in="glow" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
               </filter>
             </defs>
-            <polygon
-              points="22,56 2,14 22,0 42,14"
-              fill="url(#pointerGold)"
-              filter="url(#pointerGlow)"
+            <path
+              d="M18 13 L2 2 L6 13 L2 24 Z"
+              fill="url(#nunkArrowLeftGrad)"
+              filter="url(#nunkArrowLeftGlow)"
             />
-            <polygon points="22,50 6,16 22,4" fill="rgba(255,255,255,0.3)" />
-            <circle cx="22" cy="24" r="8" fill="#FEF3C7" />
-            <circle cx="22" cy="24" r="5" fill="#FBBF24" />
-            <circle cx="19" cy="21" r="2" fill="white" opacity="0.8" />
           </svg>
         </div>
-      </div>
 
-      {/* Main Wheel */}
-      <div className="relative aspect-square">
-        <svg viewBox={`0 0 ${size} ${size}`} className="h-full w-full">
-          <defs>
-            {/* Sector gradients */}
-            {prizes.map((prize, index) => {
-              const color = getSectorColors(index, prize.color);
-              return (
-                <linearGradient
-                  key={`grad-${index}`}
-                  id={`sectorGrad-${index}`}
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="100%"
-                >
-                  <stop offset="0%" stopColor={color} stopOpacity="1" />
-                  <stop offset="50%" stopColor={color} stopOpacity="0.85" />
-                  <stop offset="100%" stopColor={color} stopOpacity="0.7" />
-                </linearGradient>
-              );
-            })}
+        {/* Правая стрелка */}
+        <div
+          className={`pointer-events-none absolute right-1 z-30 ${
+            isSpinning ? 'nunk-arrow-spinning' : 'nunk-arrow'
+          }`}
+          style={
+            {
+              top: `${baseShift + ITEM_HEIGHT / 2}px`,
+              transform: 'translateY(-50%)',
+              ['--nudge' as string]: '-4px',
+            } as React.CSSProperties
+          }
+        >
+          <svg width="20" height="26" viewBox="0 0 20 26" fill="none">
+            <defs>
+              <linearGradient id="nunkArrowRightGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style={{ stopColor: accent, transition: 'stop-color 0.4s ease' }} />
+                <stop offset="50%" style={{ stopColor: accentLight, transition: 'stop-color 0.4s ease' }} />
+                <stop offset="100%" style={{ stopColor: accentPale, transition: 'stop-color 0.4s ease' }} />
+              </linearGradient>
+              <filter id="nunkArrowRightGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="blur" />
+                <feFlood floodColor={accentLight} floodOpacity="0.9" />
+                <feComposite in2="blur" operator="in" result="glow" />
+                <feMerge>
+                  <feMergeNode in="glow" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <path
+              d="M2 13 L18 2 L14 13 L18 24 Z"
+              fill="url(#nunkArrowRightGrad)"
+              filter="url(#nunkArrowRightGlow)"
+            />
+          </svg>
+        </div>
 
-            {/* Outer ring gradient */}
-            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#C084FC" />
-              <stop offset="25%" stopColor="#A855F7" />
-              <stop offset="50%" stopColor="#7C3AED" />
-              <stop offset="75%" stopColor="#A855F7" />
-              <stop offset="100%" stopColor="#C084FC" />
-            </linearGradient>
+        {/* Верхний блик корпуса — в акцентном цвете */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-30 h-px"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(var(--accent-light-rgb), 0.6) 50%, transparent 100%)',
+            transition: 'background 0.4s ease',
+          }}
+        />
 
-            {/* Hub gradient */}
-            <radialGradient id="hubGrad" cx="30%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#818CF8" />
-              <stop offset="50%" stopColor="#6366F1" />
-              <stop offset="100%" stopColor="#4338CA" />
-            </radialGradient>
-
-            {/* Text shadow filter */}
-            <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="#000" floodOpacity="0.7" />
-            </filter>
-          </defs>
-
-          {/* Background shadow */}
-          <circle cx={center} cy={center + 6} r={outerRadius + 5} fill="rgba(0,0,0,0.3)" />
-
-          {/* Outer decorative ring */}
-          <circle
-            cx={center}
-            cy={center}
-            r={outerRadius}
-            fill="none"
-            stroke="url(#ringGrad)"
-            strokeWidth="15"
-          />
-
-          {/* Inner ring border */}
-          <circle
-            cx={center}
-            cy={center}
-            r={innerRadius}
-            fill="none"
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth="2"
-          />
-
-          {/* LED chase animation — pure CSS, no React re-renders */}
-          <style>
-            {`
-              @keyframes ledChase {
-                0%, 100% { fill: #374151; stroke: #1F2937; }
-                10%, 30% { fill: #FEF08A; stroke: #FDE047; }
-              }
-              @keyframes ledGlow {
-                0%, 100% { opacity: 0; }
-                10%, 30% { opacity: 0.4; }
-              }
-              .led-dot { animation: ledChase 6s linear infinite; }
-              .led-glow { opacity: 0; animation: ledGlow 6s linear infinite; }
-              .led-spinning .led-dot { animation-duration: 2s; }
-              .led-spinning .led-glow { animation-duration: 2s; }
-            `}
-          </style>
-          <g className={isSpinning ? 'led-spinning' : undefined}>
-            {Array.from({ length: 20 }).map((_, i) => {
-              const angle = (i * 18 - 90) * (Math.PI / 180);
-              const ledRadius = outerRadius + 3;
-              const dotX = center + ledRadius * Math.cos(angle);
-              const dotY = center + ledRadius * Math.sin(angle);
-              // Delay as fraction of full cycle — CSS handles speed via animation-duration
-              const delay = `${(i / 20) * 6}s`;
-              return (
-                <g key={`led-${i}`}>
-                  <circle
-                    className="led-glow"
-                    cx={dotX}
-                    cy={dotY}
-                    r={5}
-                    fill="#FEF08A"
-                    style={{ filter: 'blur(2px)', animationDelay: delay }}
-                  />
-                  <circle
-                    className="led-dot"
-                    cx={dotX}
-                    cy={dotY}
-                    r={3.5}
-                    strokeWidth="1"
-                    style={{ animationDelay: delay }}
-                  />
-                </g>
-              );
-            })}
-          </g>
-
-          {/* Rotating wheel group */}
-          <g
-            ref={wheelRef}
-            style={{
-              transformOrigin: `${center}px ${center}px`,
-              transform: `rotate(${displayRotation}deg)`,
-              transition: isSpinning ? 'transform 5s cubic-bezier(0.15, 0.6, 0.1, 1)' : 'none',
-            }}
-          >
-            {/* Sectors */}
-            {prizes.map((prize, index) => (
-              <path
-                key={`sector-${prize.id}`}
-                d={createSectorPath(index)}
-                fill={`url(#sectorGrad-${index})`}
-                stroke="rgba(255,255,255,0.15)"
-                strokeWidth="2"
-              />
-            ))}
-
-            {/* Sector dividers */}
-            {prizes.map((_, index) => {
-              const angle = (index * sectorAngle - 90) * (Math.PI / 180);
-              const x1 = center + hubRadius * Math.cos(angle);
-              const y1 = center + hubRadius * Math.sin(angle);
-              const x2 = center + prizeRadius * Math.cos(angle);
-              const y2 = center + prizeRadius * Math.sin(angle);
-              return (
-                <line
-                  key={`divider-${index}`}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke="rgba(255,255,255,0.25)"
-                  strokeWidth="2"
-                />
-              );
-            })}
-
-            {/* Prize content - Emoji */}
-            {prizes.map((prize, index) => {
-              const pos = getEmojiPosition(index);
-              return (
-                <text
-                  key={`emoji-${prize.id}`}
-                  x={pos.x}
-                  y={pos.y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={prizes.length <= 6 ? '32' : '26'}
-                  transform={`rotate(${pos.rotation}, ${pos.x}, ${pos.y})`}
-                  style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.5))' }}
-                >
-                  {prize.emoji}
-                </text>
-              );
-            })}
-
-            {/* Prize content - Text removed, only emoji visible on wheel */}
-          </g>
-
-          {/* Center hub */}
-          <circle
-            cx={center}
-            cy={center}
-            r={hubRadius}
-            fill="url(#hubGrad)"
-            stroke="#A5B4FC"
-            strokeWidth="3"
-          />
-
-          {/* Hub inner decoration */}
-          <circle
-            cx={center}
-            cy={center}
-            r={hubRadius - 8}
-            fill="none"
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth="1"
-          />
-
-          {/* Hub shine */}
-          <ellipse cx={center - 10} cy={center - 12} rx={15} ry={10} fill="rgba(255,255,255,0.2)" />
-
-          {/* Center button */}
-          <circle
-            cx={center}
-            cy={center}
-            r={hubRadius - 12}
-            fill="#312E81"
-            stroke="#6366F1"
-            strokeWidth="2"
-          />
-
-          {/* Center text */}
-          <text
-            x={center}
-            y={center + 1}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fontSize="11"
-            fontWeight="bold"
-            fill="#C7D2FE"
-            letterSpacing="0.15em"
-          >
-            {isSpinning ? '...' : 'SPIN'}
-          </text>
-        </svg>
-
-        {/* Spinning overlay glow */}
-        {isSpinning && (
+        {/* WIN-эффект: вспышка в акцентном цвете */}
+        {winFlash && (
           <div
-            className="pointer-events-none absolute inset-0 rounded-full"
+            className="nunk-win-flash pointer-events-none absolute left-3 right-3 z-40 rounded-xl"
             style={{
-              background: 'radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 50%)',
-              animation: 'pulse 0.5s ease-in-out infinite',
+              top: `${baseShift}px`,
+              height: `${ITEM_HEIGHT}px`,
+              background:
+                'radial-gradient(ellipse at center, rgba(255,255,255,0.5) 0%, rgba(var(--accent-light-rgb), 0.4) 40%, transparent 75%)',
             }}
           />
         )}
-      </div>
 
-      {/* Sparkle effects when spinning - optimized with pre-calculated positions */}
-      {isSpinning && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {SPARKLE_POSITIONS.map((pos, i) => (
-            <div
-              key={`sparkle-${i}`}
-              className="absolute h-2 w-2 animate-ping rounded-full bg-yellow-300"
-              style={{
-                top: pos.top,
-                left: pos.left,
-                animationDelay: pos.delay,
-                animationDuration: '1.5s',
-                opacity: 0.7,
-              }}
-            />
-          ))}
-        </div>
-      )}
+        {/* WIN-эффект: частицы из палитры цвета приза */}
+        {winFlash && winnerIndex !== null && (
+          <div
+            className="pointer-events-none absolute left-1/2 z-40"
+            style={{
+              top: `${baseShift + ITEM_HEIGHT / 2}px`,
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            {Array.from({ length: 16 }).map((_, i) => {
+              const angle = (i / 16) * Math.PI * 2;
+              const distance = 90 + (i % 3) * 25;
+              const dx = Math.cos(angle) * distance;
+              const dy = Math.sin(angle) * distance;
+              // Палитра конфетти строится из акцентного цвета + один тёплый блик
+              const palette = [accent, accentLight, accentPale, '#FDE68A'];
+              const dotColor = palette[i % palette.length];
+              return (
+                <div
+                  key={`spark-${i}`}
+                  className="nunk-sparkle absolute h-1.5 w-1.5 rounded-full"
+                  style={
+                    {
+                      background: dotColor,
+                      boxShadow: `0 0 6px ${dotColor}`,
+                      animationDelay: `${(i % 4) * 0.05}s`,
+                      '--dx': `${dx}px`,
+                      '--dy': `${dy}px`,
+                    } as React.CSSProperties
+                  }
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 });

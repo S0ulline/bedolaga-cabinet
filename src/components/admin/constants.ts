@@ -293,4 +293,21 @@ export const THEME_PRESETS: ThemePreset[] = [
       error: '#ef4444',
     },
   },
+  {
+    id: 'nunk',
+    colors: {
+      accent: '#9958e3',
+      darkBackground: '#141414',
+      darkSurface: '#1e1b2e',
+      darkText: '#faf5ff',
+      darkTextSecondary: '#c4b5fd',
+      lightBackground: '#f3e8ff',
+      lightSurface: '#faf5ff',
+      lightText: '#581c87',
+      lightTextSecondary: '#7f2edc',
+      success: '#1fc49b',
+      warning: '#f1b753',
+      error: '#dc2e45',
+    },
+  },
 ];
