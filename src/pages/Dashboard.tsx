@@ -21,6 +21,7 @@ import { promoApi } from '../api/promo';
 import PendingGiftCard from '../components/dashboard/PendingGiftCard';
 import SubscriptionListCard from '../components/subscription/SubscriptionListCard';
 import { API } from '../config/constants';
+import ServerStatusBanner from '../components/dashboard/DashboardCheckerBanner';
 
 const ChevronRightIcon = () => (
   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -284,7 +285,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Pending Gift Activations */}
+      {/* 2. System Status Banner (ЗАГЛУШКА / METRICS LINK) */}
+      <ServerStatusBanner />
+
+      {/* 3. Urgent Notifications (Gifts) */}
       {pendingGifts && pendingGifts.length > 0 && <PendingGiftCard gifts={pendingGifts} />}
 
       {/* Multi-tariff: show subscription cards (max 3) */}

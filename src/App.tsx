@@ -156,6 +156,8 @@ const InfoPageView = lazyWithRetry(() => import('./pages/InfoPageView'));
 const AdminInfoPages = lazyWithRetry(() => import('./pages/AdminInfoPages'));
 const AdminInfoPageEditor = lazyWithRetry(() => import('./pages/AdminInfoPageEditor'));
 
+const Checker = lazyWithRetry(() => import('./pages/Checker'));
+
 function ProtectedRoute({
   children,
   withLayout = true,
@@ -1350,6 +1352,17 @@ function App() {
           }
         />
         <Route path="/promo" element={<PromoLanding />} />
+
+        <Route
+          path="/checker"
+          element={
+            <ProtectedRoute>
+              <LazyPage>
+                <Checker />
+              </LazyPage>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />
