@@ -45,6 +45,7 @@ import OAuthCallback from './pages/OAuthCallback';
 
 // Dashboard - load eagerly (default route, LCP-critical)
 import Dashboard from './pages/Dashboard';
+import PromoLanding from './pages/PromoLanding';
 
 // User pages - lazy load
 const Subscriptions = lazyWithRetry(() => import('./pages/Subscriptions'));
@@ -155,6 +156,8 @@ const InfoPageView = lazyWithRetry(() => import('./pages/InfoPageView'));
 const AdminInfoPages = lazyWithRetry(() => import('./pages/AdminInfoPages'));
 const AdminInfoPageEditor = lazyWithRetry(() => import('./pages/AdminInfoPageEditor'));
 
+const Checker = lazyWithRetry(() => import('./pages/Checker'));
+
 function ProtectedRoute({
   children,
   withLayout = true,
@@ -172,7 +175,8 @@ function ProtectedRoute({
 
   if (!isAuthenticated) {
     saveReturnUrl();
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    const fullPath = location.pathname + location.search;
+    return <Navigate to="/login" replace state={{ from: fullPath }} />;
   }
 
   return withLayout ? <Layout>{children}</Layout> : <>{children}</>;
@@ -1345,6 +1349,18 @@ function App() {
                 <AdminAuditLog />
               </LazyPage>
             </PermissionRoute>
+          }
+        />
+        <Route path="/promo" element={<PromoLanding />} />
+
+        <Route
+          path="/checker"
+          element={
+            <ProtectedRoute>
+              <LazyPage>
+                <Checker />
+              </LazyPage>
+            </ProtectedRoute>
           }
         />
 

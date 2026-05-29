@@ -45,7 +45,8 @@
     "info": "信息",
     "wheel": "幸运转盘",
     "menu": "菜单",
-    "gift": "赠送"
+    "gift": "赠送",
+    "status": "服务器状态"
   },
   "notifications": {
     "ticketNotifications": "工单通知",
@@ -4436,5 +4437,22 @@
         "linkUrlPrompt": "URL："
       }
     }
+  },
+  "metrics": {
+    "title": "服务器状态",
+    "subtitle": "服务器可用性监控",
+    "error": "无法加载服务器数据",
+    "allOnline": "所有服务器运行正常",
+    "someOffline": "部分服务器离线，我们正在修复",
+    "updatedAt": "更新于",
+    "autoRefresh": "每 2 分钟自动刷新",
+    "stats": {
+      "total": "总计",
+      "online": "在线",
+      "latency": "平均延迟",
+      "graph": "图表",
+      "offline": "离线"
+    },
+    "legend": "图表"
   }
 }

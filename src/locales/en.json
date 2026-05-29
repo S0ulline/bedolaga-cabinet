@@ -45,7 +45,8 @@
     "info": "Info",
     "wheel": "Fortune Wheel",
     "menu": "Menu",
-    "gift": "Gift"
+    "gift": "Gift",
+    "status": "Server Status"
   },
   "notifications": {
     "ticketNotifications": "Ticket Notifications",
@@ -4966,5 +4967,22 @@
         "linkUrlPrompt": "URL:"
       }
     }
+  },
+  "metrics": {
+    "title": "Server Status",
+    "subtitle": "Server availability monitoring",
+    "error": "Failed to load server data",
+    "allOnline": "All servers are working properly",
+    "someOffline": "Some servers are offline. We are already fixing it",
+    "updatedAt": "Updated at",
+    "autoRefresh": "auto-refresh every 2 mins",
+    "stats": {
+      "total": "Total",
+      "online": "Online",
+      "latency": "Avg. ping",
+      "graph": "Graph",
+      "offline": "Offline"
+    },
+    "legend": "Graph"
   }
 }

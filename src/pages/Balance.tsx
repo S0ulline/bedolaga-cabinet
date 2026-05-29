@@ -40,6 +40,7 @@ export default function Balance() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const paymentHandledRef = useRef(false);
+  const promoHandledRef = useRef(false);
 
   // Fetch balance from API
   const { data: balanceData, refetch: refetchBalance } = useQuery({
@@ -72,6 +73,30 @@ export default function Balance() {
       navigate('/balance/top-up/result?status=failed', { replace: true });
     }
   }, [searchParams, navigate]);
+
+  // Обработка deeplink для промокода
+  useEffect(() => {
+    if (promoHandledRef.current) return;
+
+    const promoFromUrl = searchParams.get('promocode');
+
+    if (promoFromUrl) {
+      promoHandledRef.current = true;
+
+      // 1. Подставляем в инпут визуально
+      setPromocode(promoFromUrl);
+
+      // 2. Автоматически запускаем активацию передавая код напрямую
+      handlePromocodeActivate(undefined, promoFromUrl);
+
+      // 3. Очищаем URL от параметра, чтобы при F5 не было повторной активации
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('promocode');
+      navigate({ search: newParams.toString() }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, navigate]);
+  // (handlePromocodeActivate не добавляем в зависимости, чтобы не словить бесконечный цикл ререндеров)
 
   const [promocode, setPromocode] = useState('');
   const [promocodeLoading, setPromocodeLoading] = useState(false);
@@ -141,8 +166,9 @@ export default function Balance() {
     }
   };
 
-  const handlePromocodeActivate = async (subscriptionId?: number) => {
-    const code = subscriptionId ? promoSelectCode || '' : promocode.trim();
+  const handlePromocodeActivate = async (subscriptionId?: number, autoCode?: string) => {
+    const code = subscriptionId ? promoSelectCode || '' : (autoCode || promocode).trim();
+
     if (!code) return;
 
     setPromocodeLoading(true);

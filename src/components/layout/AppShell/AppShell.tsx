@@ -20,7 +20,7 @@ import CampaignBonusNotifier from '@/components/CampaignBonusNotifier';
 import SuccessNotificationModal from '@/components/SuccessNotificationModal';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import TicketNotificationBell from '@/components/TicketNotificationBell';
-import { SubscriptionIcon, GiftIcon } from '@/components/icons';
+import { SubscriptionIcon, GiftIcon, ChartIcon } from '@/components/icons';
 
 import { MobileBottomNav } from './MobileBottomNav';
 import { AppHeader } from './AppHeader';
@@ -181,6 +181,7 @@ export function AppShell({ children }: AppShellProps) {
     { path: '/', label: t('nav.dashboard'), icon: HomeIcon },
     { path: '/subscriptions', label: t('nav.subscription'), icon: SubscriptionIcon },
     { path: '/balance', label: t('nav.balance'), icon: WalletIcon },
+    { path: '/checker', label: t('nav.status'), icon: ChartIcon },
     { path: '/support', label: t('nav.support'), icon: ChatIcon },
     { path: '/info', label: t('nav.info'), icon: InfoIcon },
     { path: '/profile', label: t('nav.profile'), icon: UserIcon },
@@ -366,7 +367,9 @@ export function AppShell({ children }: AppShellProps) {
       <div
         className="lg:hidden"
         style={{
-          height: `calc(${headerHeight}px + env(safe-area-inset-top, 0px))`,
+          height: isMobileFullscreen
+            ? `${headerHeight}px` // fullscreen: headerHeight уже всё включает
+            : `calc(${headerHeight}px + env(safe-area-inset-top, 0px))`, // веб/не-fullscreen: добавляем env()
         }}
       />
 
