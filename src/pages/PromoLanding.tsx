@@ -1,6 +1,6 @@
 import { useSearchParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+//import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
 import { Card } from '@/components/data-display/Card';
@@ -13,7 +13,7 @@ import { promocodesApi } from '../api/promocodes';
 
 export default function PromoLanding() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -25,7 +25,7 @@ export default function PromoLanding() {
   const {
     data: promoInfo,
     isLoading,
-    isError,
+    //isError,
   } = useQuery({
     queryKey: ['public-promocode', promocode],
     queryFn: () =>
