@@ -42,6 +42,7 @@ import {
   SunIcon,
   MoonIcon,
   SearchIcon,
+  ChartIcon,
 } from './icons';
 
 const FALLBACK_NAME = import.meta.env.VITE_APP_NAME || 'Cabinet';
@@ -163,6 +164,7 @@ export function AppHeader({
     { path: '/', label: t('nav.dashboard'), icon: HomeIcon },
     { path: '/subscriptions', label: t('nav.subscription'), icon: SubscriptionIcon },
     { path: '/balance', label: t('nav.balance'), icon: WalletIcon },
+    { path: '/checker', label: t('nav.status'), icon: ChartIcon },
     ...(referralEnabled ? [{ path: '/referral', label: t('nav.referral'), icon: UsersIcon }] : []),
     { path: '/support', label: t('nav.support'), icon: ChatIcon },
     ...(hasContests ? [{ path: '/contests', label: t('nav.contests'), icon: GamepadIcon }] : []),
@@ -176,7 +178,7 @@ export function AppHeader({
     <>
       {/* Header - only on mobile */}
       <header
-        className="fixed left-0 right-0 top-0 z-50 shadow-lg shadow-black/10 lg:hidden backdrop-blur-md border-b border-dark-700 border-opacity-30 bg-dark-900 bg-opacity-80"
+        className="fixed left-0 right-0 top-0 z-50 border-b border-dark-700 border-opacity-30 bg-dark-900 bg-opacity-80 shadow-lg shadow-black/10 backdrop-blur-md lg:hidden"
         style={{
           paddingTop: isFullscreen
             ? `${Math.max(safeAreaInset.top, contentSafeAreaInset.top) + (telegramPlatform === 'android' ? 48 : 45)}px`
