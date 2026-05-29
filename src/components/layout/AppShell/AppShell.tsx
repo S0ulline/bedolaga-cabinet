@@ -367,7 +367,9 @@ export function AppShell({ children }: AppShellProps) {
       <div
         className="lg:hidden"
         style={{
-          height: `calc(${headerHeight}px + env(safe-area-inset-top, 0px))`,
+          height: isMobileFullscreen
+            ? `${headerHeight}px` // fullscreen: headerHeight уже всё включает
+            : `calc(${headerHeight}px + env(safe-area-inset-top, 0px))`, // веб/не-fullscreen: добавляем env()
         }}
       />
 

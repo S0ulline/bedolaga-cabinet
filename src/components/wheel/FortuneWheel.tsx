@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, memo } from 'react';
-import type { WheelPrize } from '../../api/wheel';
+import type { WheelPrize } from 'src/api/wheel.ts';
 
 interface FortuneWheelProps {
   prizes: WheelPrize[];
@@ -60,11 +60,11 @@ const hexToRgb = (hex: string): string => {
 };
 
 const FortuneWheel = memo(function FortuneWheel({
-                                                  prizes,
-                                                  isSpinning,
-                                                  targetRotation,
-                                                  onSpinComplete,
-                                                }: FortuneWheelProps) {
+  prizes,
+  isSpinning,
+  targetRotation,
+  onSpinComplete,
+}: FortuneWheelProps) {
   const stripRef = useRef<HTMLDivElement>(null);
 
   const middleOffset =
@@ -91,9 +91,9 @@ const FortuneWheel = memo(function FortuneWheel({
   }, [onSpinComplete]);
 
   // ── ЗАПУСК СПИНА ──
+  // ── ЗАПУСК СПИНА ──
   useEffect(() => {
     if (!isSpinning || targetRotation === null || prizes.length === 0) return;
-    // Если для этого же targetRotation спин уже запущен — пропускаем.
     if (activeSpinRotation.current === targetRotation) return;
 
     activeSpinRotation.current = targetRotation;
@@ -101,8 +101,6 @@ const FortuneWheel = memo(function FortuneWheel({
     setWinnerIndex(null);
 
     const sectorAngle = 360 / prizes.length;
-    // Сервер возвращает угол поворота колеса по часовой стрелке.
-    // Под указателем оказывается сектор, противоположный направлению вращения.
     const normalizedAngle = (((360 - targetRotation) % 360) + 360) % 360;
     const targetIndex = Math.floor(normalizedAngle / sectorAngle) % prizes.length;
     const totalItems = prizes.length;
@@ -119,37 +117,52 @@ const FortuneWheel = memo(function FortuneWheel({
     accumulatedOffset.current = newOffset;
     setDisplayOffset(newOffset);
 
-    const spinTimeout = setTimeout(() => {
+    const strip = stripRef.current;
+    let finished = false;
+
+    const finishSpin = () => {
+      if (finished) return;
+      finished = true;
+
       setWinnerIndex(targetIndex);
       setWinFlash(true);
       activeSpinRotation.current = null;
       onSpinCompleteRef.current();
 
       // Нормализация смещения к середине ленты без визуального скачка.
-      setTimeout(() => {
-        const period = totalItems * ITEM_HEIGHT;
-        const driftFromMiddle = accumulatedOffset.current - middleOffset;
-        const periodsToShift = Math.round(driftFromMiddle / period);
+      const period = totalItems * ITEM_HEIGHT;
+      const driftFromMiddle = accumulatedOffset.current - middleOffset;
+      const periodsToShift = Math.round(driftFromMiddle / period);
 
-        if (periodsToShift !== 0) {
-          const normalized = accumulatedOffset.current - periodsToShift * period;
-          skipNextTransition.current = true;
-          accumulatedOffset.current = normalized;
-          setDisplayOffset(normalized);
-        }
-      }, 0);
-    }, 5000);
+      if (periodsToShift !== 0) {
+        const normalized = accumulatedOffset.current - periodsToShift * period;
+        skipNextTransition.current = true;
+        accumulatedOffset.current = normalized;
+        setDisplayOffset(normalized);
+      }
+    };
+
+    // Ловим РЕАЛЬНЫЙ конец CSS-transition ленты, а не угадываем через setTimeout.
+    // Это убирает рассинхрон на проде, где setTimeout(5000) мог сработать
+    // до фактического завершения анимации и вызвать резкий доскок.
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      if (e.target !== strip) return; // только transform самой ленты
+      if (e.propertyName !== 'transform') return;
+      finishSpin();
+    };
+
+    strip?.addEventListener('transitionend', handleTransitionEnd);
+
+    // Подстраховка: если transitionend по какой-то причине не выстрелит
+    // (вкладка ушла в фон, браузер пропустил событие) — фолбэк-таймер
+    // чуть БОЛЬШЕ длительности анимации, чтобы не сработать раньше времени.
+    const fallbackTimeout = setTimeout(finishSpin, 5300);
 
     return () => {
-      // ВАЖНО: при cleanup НЕ сбрасываем activeSpinRotation и НЕ чистим таймер.
-      // Если useEffect просто переоценился (родитель перерендерился) — таймер
-      // должен продолжать тикать, иначе onSpinComplete никогда не вызовется
-      // и кнопка зависнет. Cleanup при анмаунте компонента — мы и так не хотим
-      // вызывать setState после размонтирования, но spinTimeout сам отработает
-      // и React просто проигнорирует setState на размонтированном компоненте
-      // (выдаст ворнинг, но это безопаснее, чем зависший спин).
-      // Делаем cleanup пустым специально.
-      void spinTimeout;
+      // Снимаем слушатель и фолбэк. activeSpinRotation НЕ сбрасываем
+      // (та же причина, что и раньше — переоценка эффекта родителем).
+      strip?.removeEventListener('transitionend', handleTransitionEnd);
+      clearTimeout(fallbackTimeout);
     };
   }, [isSpinning, targetRotation, prizes.length, middleOffset]);
 
@@ -380,9 +393,18 @@ const FortuneWheel = memo(function FortuneWheel({
               <linearGradient id="nunkArrowLeftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 {/* stop-color через CSS-style, чтобы он реагировал на смену акцента
                     с плавным transition. Атрибут stop-color этого не умеет. */}
-                <stop offset="0%" style={{ stopColor: accent, transition: 'stop-color 0.4s ease' }} />
-                <stop offset="50%" style={{ stopColor: accentLight, transition: 'stop-color 0.4s ease' }} />
-                <stop offset="100%" style={{ stopColor: accentPale, transition: 'stop-color 0.4s ease' }} />
+                <stop
+                  offset="0%"
+                  style={{ stopColor: accent, transition: 'stop-color 0.4s ease' }}
+                />
+                <stop
+                  offset="50%"
+                  style={{ stopColor: accentLight, transition: 'stop-color 0.4s ease' }}
+                />
+                <stop
+                  offset="100%"
+                  style={{ stopColor: accentPale, transition: 'stop-color 0.4s ease' }}
+                />
               </linearGradient>
               <filter id="nunkArrowLeftGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="2" result="blur" />
@@ -418,9 +440,18 @@ const FortuneWheel = memo(function FortuneWheel({
           <svg width="20" height="26" viewBox="0 0 20 26" fill="none">
             <defs>
               <linearGradient id="nunkArrowRightGrad" x1="100%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style={{ stopColor: accent, transition: 'stop-color 0.4s ease' }} />
-                <stop offset="50%" style={{ stopColor: accentLight, transition: 'stop-color 0.4s ease' }} />
-                <stop offset="100%" style={{ stopColor: accentPale, transition: 'stop-color 0.4s ease' }} />
+                <stop
+                  offset="0%"
+                  style={{ stopColor: accent, transition: 'stop-color 0.4s ease' }}
+                />
+                <stop
+                  offset="50%"
+                  style={{ stopColor: accentLight, transition: 'stop-color 0.4s ease' }}
+                />
+                <stop
+                  offset="100%"
+                  style={{ stopColor: accentPale, transition: 'stop-color 0.4s ease' }}
+                />
               </linearGradient>
               <filter id="nunkArrowRightGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="2" result="blur" />
