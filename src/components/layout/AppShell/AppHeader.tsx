@@ -182,7 +182,9 @@ export function AppHeader({
         style={{
           paddingTop: isFullscreen
             ? `${Math.max(safeAreaInset.top, contentSafeAreaInset.top) + (telegramPlatform === 'android' ? 48 : 45)}px`
-            : 'env(safe-area-inset-top, 0px)', // ← добавить это
+            : platform === 'telegram'
+              ? `${Math.max(safeAreaInset.top, contentSafeAreaInset.top)}px` // в miniapp — только SDK
+              : 'env(safe-area-inset-top, 0px)', // чистый веб — только env()
         }}
       >
         <div
